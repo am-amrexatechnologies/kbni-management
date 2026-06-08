@@ -1,6 +1,6 @@
 // ── Config ────────────────────────────────────────────────────────────────
 // VITE_API_BASE in .env setzen, wenn Backend auf anderem Server läuft.
-const BASE = import.meta.env.VITE_API_BASE ?? ''
+const BASE = import.meta.env.VITE_API_URL ?? ''
 
 async function request(method, path, body) {
   const opts = {
