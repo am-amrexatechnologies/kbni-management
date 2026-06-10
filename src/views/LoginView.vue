@@ -20,11 +20,17 @@ async function handleLogin() {
   loading.value = true
   error.value   = ''
   try {
-    const res = await api.login(username.value, password.value)
+    const res = await api.adminLogin(username.value, password.value)
     auth.setUser(res.user)
     router.push('/dashboard')
   } catch (e) {
-    error.value = 'Anmeldung fehlgeschlagen: ' + e.message
+    if (e.status === 403) {
+      error.value = 'Kein Zugriff: Dein Account hat keine Admin-Berechtigung.'
+    } else if (e.status === 401) {
+      error.value = 'Falscher Username oder falsches Passwort.'
+    } else {
+      error.value = 'Anmeldung fehlgeschlagen: ' + e.message
+    }
   } finally {
     loading.value = false
   }
