@@ -5,6 +5,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(JSON.parse(sessionStorage.getItem('admin_user') || 'null'))
 
   const isLoggedIn = computed(() => !!user.value)
+  const isAdmin    = computed(() => user.value?.role === 'admin')
   const initials   = computed(() => user.value?.username?.[0]?.toUpperCase() ?? '?')
 
   function setUser(u) {
@@ -17,5 +18,5 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.removeItem('admin_user')
   }
 
-  return { user, isLoggedIn, initials, setUser, clear }
+  return { user, isLoggedIn, isAdmin, initials, setUser, clear }
 })
