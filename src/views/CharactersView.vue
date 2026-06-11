@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import DataTable    from '@/components/DataTable.vue'
-import AppModal     from '@/components/AppModal.vue'
+import DataTable     from '@/components/DataTable.vue'
+import AppModal      from '@/components/AppModal.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { useToast } from '@/composables/useToast'
+import { useToast }  from '@/composables/useToast'
 import * as api from '@/api'
 
 const { toast } = useToast()
@@ -16,7 +16,8 @@ const showModal  = ref(false)
 const modalMode  = ref('create')
 const editingId  = ref(null)
 const saving     = ref(false)
-const form = ref({ name: '', lastname: '', age: '', animeid: '' })
+// age entfernt — existiert nicht mehr im DB-Schema
+const form = ref({ name: '', lastname: '', animeid: '' })
 const showConfirm  = ref(false)
 const deletingItem = ref(null)
 
@@ -24,7 +25,7 @@ const columns = [
   { key: 'id',       label: 'ID'       },
   { key: 'name',     label: 'Vorname'  },
   { key: 'lastname', label: 'Nachname' },
-  { key: 'age',      label: 'Alter'    },
+  // age-Spalte entfernt
   { label: 'Anime',    slot: 'anime'   },
   { label: 'Aktionen', slot: 'actions' },
 ]
@@ -33,7 +34,7 @@ const filtered = computed(() => {
   const q = search.value.toLowerCase()
   if (!q) return items.value
   return items.value.filter(r =>
-    (r.name ?? '').toLowerCase().includes(q) ||
+    (r.name     ?? '').toLowerCase().includes(q) ||
     (r.lastname ?? '').toLowerCase().includes(q)
   )
 })
@@ -55,7 +56,7 @@ async function load() {
 function openCreate() {
   modalMode.value = 'create'
   editingId.value = null
-  form.value = { name: '', lastname: '', age: '', animeid: '' }
+  form.value = { name: '', lastname: '', animeid: '' }
   showModal.value = true
 }
 
@@ -65,7 +66,7 @@ function openEdit(row) {
   form.value = {
     name:     row.name     ?? '',
     lastname: row.lastname ?? '',
-    age:      row.age      ?? '',
+    // age entfernt
     animeid:  row.animeid  ?? '',
   }
   showModal.value = true
@@ -76,7 +77,7 @@ async function save() {
   const body = {
     name:     form.value.name     || null,
     lastname: form.value.lastname || null,
-    age:      form.value.age      ? Number(form.value.age)     : null,
+    // age entfernt
     animeid:  form.value.animeid  ? Number(form.value.animeid) : null,
   }
   try {
@@ -145,6 +146,7 @@ onMounted(load)
       :title="modalMode === 'create' ? 'Neuen Charakter erstellen' : 'Charakter bearbeiten'"
       @close="showModal = false"
     >
+      <!-- age-Feld entfernt, nur noch Vorname / Nachname nebeneinander -->
       <div class="form-row">
         <div class="form-group">
           <label>Vorname</label>
@@ -155,20 +157,14 @@ onMounted(load)
           <input v-model="form.lastname" placeholder="z.B. Uzumaki" />
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Alter</label>
-          <input v-model="form.age" type="number" placeholder="z.B. 16" />
-        </div>
-        <div class="form-group">
-          <label>Anime</label>
-          <select v-model="form.animeid">
-            <option value="">— keiner —</option>
-            <option v-for="a in animeList" :key="a.id" :value="a.id">
-              {{ a.animename }}
-            </option>
-          </select>
-        </div>
+      <div class="form-group">
+        <label>Anime</label>
+        <select v-model="form.animeid">
+          <option value="">— keiner —</option>
+          <option v-for="a in animeList" :key="a.id" :value="a.id">
+            {{ a.animename }}
+          </option>
+        </select>
       </div>
       <template #footer>
         <button class="btn btn-ghost" @click="showModal = false">Abbrechen</button>
